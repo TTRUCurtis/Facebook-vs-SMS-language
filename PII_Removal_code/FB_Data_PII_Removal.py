@@ -47,24 +47,19 @@ def main():
 #    options["write_to_csv"] = str(str(Path.home()) + "/pii_tagged_removed_data_"+dt.datetime.now().strftime("%Y%m%d%H%M%S")+".csv")
     options["write_to_csv"] = ""
     options["mysqlconfig"] = str(str(Path.home()) + '/.my.cnf')
-    options["source_table"] = 'fb_final'
-    options["transition_table"] = "fb_final_PII_Transition"
-    options["complete_row_table"] = "fb_final_PII_Removed"
+    options["database_name"] = "<YOUR_DATABASE_NAME_HERE>"
+    options["source_table"] = "<YOUR_SOURCE_TABLE_NAME_HERE>"
+    options["transition_table"] = "<MODIFIED_DATA_TABLE_NAME_HERE>"
+    options["complete_row_table"] = "<COMPLETED_ROW_DATA_TABLE_NAME_HERE>"
     options["replace_database_tables"] = True
     options["last_processed_id"] = 0
     options["batches_complete"] = 0
     options["batch_fetch"] = 100000
     options["fetch_count"] = 500000
     options["ping_count"] = 2500
-    options["cfg_file"] = "./FB_Data_PII_Removal_Options.json"
-    options["recover_file"] = "./FB_Data_PII_Removal_Recover_File.json"
+    options["cfg_file"] = ""
+    options["recover_file"] = ""
     
-    # Interesting segments in the data: 50000-52500 contains an email.  WIll try and use this section for optimization since it parses into like 20 tags.
-    # Possible larger segments: 47500 - 57500
-    #                           75000 - 85000
-    # Individual Rollback test cases: 
-    #               132, 133, 428,  should stay because the next row does not have more characters (deletion or same)
-    #               206, 244, 457, 476, 541 (Person Only), 629, 726, 728, 764, 766, 940, 973, 1072 should be removed
     
     # OVERRIDE GENERAL DEFAULTS WITH COMMAND LINE ARGUMENTS
     for option_tuple in optlist:
@@ -136,7 +131,7 @@ def main():
     # chokes on "localhost" (Possible remote ssh issue?).  Force Connection type by using Loopback IP address.
     myDB = db.engine.url.URL(drivername="mysql",
                             host="127.0.0.1",
-                            database = "douglasvbellew",
+                            database = options["database_name"],
                             query={"read_default_file" : options["mysqlconfig"]})
 
     #engine = db.create_engine(name_or_url=myDB, pool_pre_ping=True)            
